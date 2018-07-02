@@ -20,10 +20,12 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
@@ -57,8 +59,11 @@ public class SwingUtils{
 	
 	private static final String SRCPATH = SwingUtils.class.getClassLoader().getResource("//").getPath();
 	
+	private static JScrollPane jScrollPane;
 	/**初始化类*/
 	static {
+		jScrollPane = new JScrollPane();
+		
 		filedJpanl = new JPanel();
 		
 		buttonPanel = new JPanel();
@@ -146,12 +151,18 @@ public class SwingUtils{
 		if(filedNameList != null && filedNameList.size() > 0) {
 			/**设置布局为流式布局,在北间*/
 			titleJpanl.add(filedJpanl, BorderLayout.NORTH);
+			titleJpanl.setBorder(new EmptyBorder(5, 5, 5, 5));
+			titleJpanl.setLayout(new BorderLayout(0, 0));
+			
+			titleJpanl.add(jScrollPane, BorderLayout.CENTER);
 			/**判断是否是文本框组件*/
 			if( filedNameList.get(0).equals("0")) {
 				try {
 					logger.info("创建"+filedNameList.get(1)+"文本框开始");
+					GridLayout gridLayout = new GridLayout(0, 2);
+					
 					/**设置布局,网格布局*/
-					filedJpanl.setLayout(new GridLayout(0, 2));
+					filedJpanl.setLayout(gridLayout);
 					
 					/**创建标签*/
 					JLabel jLabel = new JLabel(filedNameList.get(1)+":",SwingConstants.TRAILING);
@@ -163,6 +174,7 @@ public class SwingUtils{
 					/**创建文本框*/
 					final JTextField field = new JTextField(50);
 					filedJpanl.add(field);
+					 
 					logger.info("创建"+filedNameList.get(1)+"文本框结束");
 				}catch(Exception ex) {
 					logger.error("创建"+filedNameList.get(1)+"文本框失败", ex);
@@ -204,8 +216,15 @@ public class SwingUtils{
 					logger.error("创建"+opt+"内容单选框内容失败",ex);
 				}
 			}
-			
-			
+			jScrollPane.setViewportView(filedJpanl);
+			//设置垂直滚动条的显示: 一直显示
+			jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+	        //设置横向滚动条的显示: 当需要的时候显示
+			jScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			//参数说明:
+	        //AS_NEEDED 需要的时候显示
+	        //ALWAYS    一直显示
+	        //NEVER     绝不显示
 		}
 	}
 	
