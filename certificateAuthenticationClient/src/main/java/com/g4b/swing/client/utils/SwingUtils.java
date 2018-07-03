@@ -12,12 +12,16 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -25,7 +29,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
@@ -40,35 +43,18 @@ import org.apache.log4j.Logger;
  */
 public class SwingUtils{
 	
-	/**定义窗格*/
-	private static JTabbedPane jTabbedPane;
-	
-	/**定义文本平面*/
-	private static JPanel filedJpanl;
-	
-	/**定义按钮的平面*/
-	private static JPanel buttonPanel;
-	
-    private static LinkedHashMap<String, Object> configMap = new LinkedHashMap<String, Object>();
-	
     private static Logger logger = Logger.getLogger(SwingUtils.class);
 	
 	private static FileChangedReloadingStrategy reloadingStrategy ;
 	
 	private static PropertiesConfiguration fileNamesProeprties;
 	
+	/**获取文件的系统目录*/
 	private static final String SRCPATH = SwingUtils.class.getClassLoader().getResource("//").getPath();
 	
-	private static JScrollPane jScrollPane;
+	
 	/**初始化类*/
 	static {
-		jScrollPane = new JScrollPane();
-		
-		filedJpanl = new JPanel();
-		
-		buttonPanel = new JPanel();
-		
-		jTabbedPane = new JTabbedPane();
 		try {
 			reloadingStrategy = new FileChangedReloadingStrategy();
 			reloadingStrategy.setRefreshDelay(Long.parseLong("1000"));
@@ -87,23 +73,16 @@ public class SwingUtils{
 	 * @param @param TitleBorder 标签栏
 	 * @param @param tabName     标签名称
 	 */
-	public static JPanel createTitledBorder(JFrame jFrame,String tabName){
+	public static JPanel createTitledBorder(JTabbedPane jTabbedPane,JPanel comp,String tabName){
 			JPanel titleBorder = new JPanel();
 		try {
 			logger.info("添加"+tabName+"标签栏开始");
-			/**创建布局*/
-			
 			/**设置间距*/
 			Border emptyBorder = BorderFactory.createEmptyBorder(10, 10, 10, 10);
-			
 			/**添加样式*/
 			titleBorder.setBorder(emptyBorder);
-			
-			/**索引添加名称*/
-			jTabbedPane.addTab(tabName, titleBorder);
-			
-			/**添加窗格*/
-			jFrame.add(jTabbedPane);
+			titleBorder.add(comp);
+			jTabbedPane.addTab(tabName,titleBorder);
 			logger.info("添加"+tabName+"标签栏结束");
 		}catch (Exception ex) {
 			logger.error("添加"+tabName+"标签栏失败");
@@ -147,14 +126,14 @@ public class SwingUtils{
 	 * @param @param filedName    		字段名称
 	 * @return void  
 	 */
-	public static void createJtextField(JPanel titleJpanl,List<String> filedNameList) {
+	public static void createJtextField(JPanel comp,JScrollPane jScrollPane,List<String> filedNameList) {
 		if(filedNameList != null && filedNameList.size() > 0) {
 			/**设置布局为流式布局,在北间*/
-			titleJpanl.add(filedJpanl, BorderLayout.NORTH);
-			titleJpanl.setBorder(new EmptyBorder(5, 5, 5, 5));
-			titleJpanl.setLayout(new BorderLayout(0, 0));
+			//comp.setBorder(new EmptyBorder(5, 5, 5, 5));
+			//comp.setLayout(new BorderLayout(0, 0));
 			
-			titleJpanl.add(jScrollPane, BorderLayout.CENTER);
+			//comp.add(jScrollPane, BorderLayout.CENTER);
+			//jPanel.add(jScrollPane, BorderLayout.CENTER);
 			/**判断是否是文本框组件*/
 			if( filedNameList.get(0).equals("0")) {
 				try {
@@ -162,18 +141,19 @@ public class SwingUtils{
 					GridLayout gridLayout = new GridLayout(0, 2);
 					
 					/**设置布局,网格布局*/
-					filedJpanl.setLayout(gridLayout);
+					comp.setLayout(gridLayout);
 					
 					/**创建标签*/
 					JLabel jLabel = new JLabel(filedNameList.get(1)+":",SwingConstants.TRAILING);
 					
 					/**设置标签居中*/
 					jLabel.setHorizontalAlignment(JLabel.CENTER);
-					filedJpanl.add(jLabel);
+					comp.add(jLabel);
 					
 					/**创建文本框*/
 					final JTextField field = new JTextField(50);
-					filedJpanl.add(field);
+										
+					comp.add(field);
 					 
 					logger.info("创建"+filedNameList.get(1)+"文本框结束");
 				}catch(Exception ex) {
@@ -191,11 +171,11 @@ public class SwingUtils{
 					
 					/**设置标签居中*/
 					jLabel.setHorizontalAlignment(JLabel.CENTER);
-					filedJpanl.add(jLabel);
+					comp.add(jLabel);
 					
 					/**创建单选框的水平图*/
 					JPanel raidaoButtonJPanel = new JPanel();
-					filedJpanl.add(raidaoButtonJPanel);
+					comp.add(raidaoButtonJPanel);
 					String reqOptStr = filedNameList.get(2);
 					String[] reqOpt = reqOptStr.split("\\.");
 					
@@ -216,7 +196,30 @@ public class SwingUtils{
 					logger.error("创建"+opt+"内容单选框内容失败",ex);
 				}
 			}
-			jScrollPane.setViewportView(filedJpanl);
+			
+			if(filedNameList.get(0).equals("2")) {
+				String opt = null;
+				try {
+					logger.info("创建"+filedNameList.get(1)+"下拉框开始");
+					/**创建标签*/
+					JLabel jLabel = new JLabel(filedNameList.get(1)+":",SwingConstants.TRAILING);
+					
+					/**设置标签居中*/
+					jLabel.setHorizontalAlignment(JLabel.CENTER);
+					comp.add(jLabel);
+					
+					String credentialTypeStr = filedNameList.get(2);
+					String[] credentialTypes = credentialTypeStr.split("\\.");
+					JComboBox<String> jComboBox = new JComboBox<>(credentialTypes);
+					comp.add(jComboBox);
+					logger.info("创建"+filedNameList.get(1)+"下拉框结束");
+				}catch(Exception ex) {
+					logger.error("创建"+opt+"下拉框内容失败",ex);
+				}
+			}
+			
+			
+			jScrollPane.setViewportView(comp);
 			//设置垂直滚动条的显示: 一直显示
 			jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 	        //设置横向滚动条的显示: 当需要的时候显示
@@ -236,17 +239,21 @@ public class SwingUtils{
 	 * @param @param color    	按钮背景色,可为null背景为默认
 	 * @return void
 	 */
-	public static void createJBotton(JFrame jFrame,String bottonName,Color color) {
+	public static JButton createJBotton(JPanel jpanl,String bottonName,Color color) {
+		
+		JButton jButton = null;
 		try {
 			logger.info("创建按钮"+bottonName+"开始");
-			jFrame.add(buttonPanel, BorderLayout.SOUTH);
-			JButton jButton = new JButton(bottonName);
+			JPanel buttonPanel = new JPanel();
+			jpanl.add(buttonPanel, BorderLayout.SOUTH);
+			jButton = new JButton(bottonName);
 			jButton.setBackground(color);
 			buttonPanel.add(jButton);
 			logger.info("创建按钮"+bottonName+"结束");
 		}catch (Exception ex) {
 			logger.error("创建"+bottonName+"按钮失败",ex);
 		}
+		return jButton;
 	}
 	
 	/**
@@ -256,6 +263,7 @@ public class SwingUtils{
 	 * @return Map<String,Object>  Map
 	 */
 	public static Map<String,Object> getMap(String fileName) {
+		LinkedHashMap<String, Object> configMap = new LinkedHashMap<String, Object>();
 		String path = new File(SRCPATH).getParentFile().getParentFile().getPath() + "/src/main/resources/filedNames/"+fileName;
 		try {
 			fileNamesProeprties.load(new InputStreamReader(new FileInputStream(path), "UTF-8"));
@@ -270,4 +278,59 @@ public class SwingUtils{
 		}
 		return configMap;
 	}
+	
+	
+	/**
+	 * @Title: verifyRequired  
+	 * @Description: TODO 验证必填项
+	 * @param @param mapData     属性文件
+	 * @param @param component   组件父类
+	 * @return void  
+	 */
+	@SuppressWarnings("unchecked")
+	public static boolean verifyRequired(Map<String,Object> mapData,Map<String,Object >moduleData) {
+		logger.info("验证必填项开始");
+		boolean flag = true;
+		try {
+			Set<Entry<String,Object>> entrySet = mapData.entrySet();
+			
+			Set<Entry<String,Object>> entrySet2 = moduleData.entrySet();
+			for (Entry<String, Object> entry : entrySet) {
+				for (Entry<String, Object> entry2 : entrySet2) {
+					if(entry.getKey().equals(entry2.getKey())) {
+						List<String> list = (List<String>)entry.getValue();
+						if(list.get(0).equals("0") && list.get(2).equals("required")) {
+							String value = (String)entry2.getValue();
+							if("".equals(value)) {
+								JOptionPane.showMessageDialog(null, list.get(1)+"不能为空", "提示框", JOptionPane.WARNING_MESSAGE);
+								flag = false;
+							}
+						}
+						
+						if(list.get(0).equals("1") && list.get(3).equals("required")) {
+							String value = (String)entry2.getValue();
+							if("".equals(value)) {
+								JOptionPane.showMessageDialog(null, list.get(1)+"不能为空", "提示框", JOptionPane.WARNING_MESSAGE);
+								flag = false;
+							}
+						}
+						
+						if(list.get(0).equals("2") && list.get(3).equals("required")) {
+							String value = (String)entry2.getValue();
+							if("".equals(value)) {
+								JOptionPane.showMessageDialog(null, list.get(1)+"不能为空", "提示框", JOptionPane.WARNING_MESSAGE);
+								flag = false;
+							}
+						}
+					}
+				}
+			}
+			logger.info("验证必填项结束");
+		}catch (Exception ex) {
+			logger.error("验证必填项错误",ex);
+		}
+		return flag;
+	}
+	
+
 }

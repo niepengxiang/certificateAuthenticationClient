@@ -10,6 +10,7 @@
 	<properties>
 		<htttpClient.version>4.5.2</htttpClient.version>
 		<log4j.version>1.2.17</log4j.version>
+		<jackJson.version>2.9.5</jackJson.version>
 	</properties>
 
 	<dependencies>
@@ -42,7 +43,7 @@
 			<version>1.10</version>
 		</dependency>
 		<!-- end -->
-		
+
 		<!-- commons lang3 start -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -50,5 +51,24 @@
 			<version>3.0</version>
 		</dependency>
 		<!-- end -->
+	
+		<!-- JackJson start -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>${jackJson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackJson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>${jackJson.version}</version>
+		</dependency>
+		<!-- end -->
+
 	</dependencies>
 </project>
