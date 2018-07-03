@@ -29,6 +29,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
@@ -45,26 +46,9 @@ public class SwingUtils{
 	
     private static Logger logger = Logger.getLogger(SwingUtils.class);
 	
-	private static FileChangedReloadingStrategy reloadingStrategy ;
-	
-	private static PropertiesConfiguration fileNamesProeprties;
-	
 	/**获取文件的系统目录*/
 	private static final String SRCPATH = SwingUtils.class.getClassLoader().getResource("//").getPath();
 	
-	
-	/**初始化类*/
-	static {
-		try {
-			reloadingStrategy = new FileChangedReloadingStrategy();
-			reloadingStrategy.setRefreshDelay(Long.parseLong("1000"));
-			fileNamesProeprties = new PropertiesConfiguration();
-			fileNamesProeprties.setReloadingStrategy(reloadingStrategy);
-		} catch (Exception ex) {
-			logger.error("SwingUtils 初始化失败！", ex);
-		}
-	}
-
 	
 	/**
 	 * @Title: createTitledBorder  
@@ -126,7 +110,7 @@ public class SwingUtils{
 	 * @param @param filedName    		字段名称
 	 * @return void  
 	 */
-	public static void createJtextField(JPanel comp,JScrollPane jScrollPane,List<String> filedNameList) {
+	public static void createJtextField(JPanel comp,List<String> filedNameList) {
 		if(filedNameList != null && filedNameList.size() > 0) {
 			/**设置布局为流式布局,在北间*/
 			//comp.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -219,11 +203,11 @@ public class SwingUtils{
 			}
 			
 			
-			jScrollPane.setViewportView(comp);
+			//jScrollPane.setViewportView(comp);
 			//设置垂直滚动条的显示: 一直显示
-			jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+			//jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 	        //设置横向滚动条的显示: 当需要的时候显示
-			jScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			//jScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 			//参数说明:
 	        //AS_NEEDED 需要的时候显示
 	        //ALWAYS    一直显示
@@ -266,6 +250,13 @@ public class SwingUtils{
 		LinkedHashMap<String, Object> configMap = new LinkedHashMap<String, Object>();
 		String path = new File(SRCPATH).getParentFile().getParentFile().getPath() + "/src/main/resources/filedNames/"+fileName;
 		try {
+			
+			FileChangedReloadingStrategy reloadingStrategy = new FileChangedReloadingStrategy();
+			reloadingStrategy.setRefreshDelay(Long.parseLong("1000"));
+			
+			PropertiesConfiguration	fileNamesProeprties = new PropertiesConfiguration();
+			
+			fileNamesProeprties.setReloadingStrategy(reloadingStrategy);
 			fileNamesProeprties.load(new InputStreamReader(new FileInputStream(path), "UTF-8"));
 			Iterator<String> keys = fileNamesProeprties.getKeys();
 			while(keys.hasNext()) {
@@ -332,5 +323,24 @@ public class SwingUtils{
 		return flag;
 	}
 	
-
+	/**
+	 * @Title: addJScrollPane  
+	 * @Description: TODO 添加滾動條
+	 * @param @param orgCerdentialComp
+	 * @param @param orgCerdentialTitle    参数  
+	 * @return void    返回类型  
+	 * @throws
+	 */
+	public static void addJScrollPane(JPanel orgCerdentialComp, JPanel orgCerdentialTitle) {
+		orgCerdentialTitle.add(orgCerdentialComp);
+        orgCerdentialTitle.setBorder(new EmptyBorder(5, 5, 5, 5));
+        orgCerdentialTitle.setLayout(new BorderLayout(0, 0));
+        JScrollPane jScrollPane = new JScrollPane(orgCerdentialComp);
+        jScrollPane.setPreferredSize(new Dimension(1000, 800));
+        orgCerdentialTitle.add(jScrollPane,BorderLayout.CENTER);
+        //设置垂直滚动条的显示: 一直显示
+  		jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+          //设置横向滚动条的显示: 当需要的时候显示
+  		jScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	}
 }

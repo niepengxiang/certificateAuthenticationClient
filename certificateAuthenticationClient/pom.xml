@@ -69,6 +69,6 @@
 			<version>${jackJson.version}</version>
 		</dependency>
 		<!-- end -->
-
+		
 	</dependencies>
 </project>
