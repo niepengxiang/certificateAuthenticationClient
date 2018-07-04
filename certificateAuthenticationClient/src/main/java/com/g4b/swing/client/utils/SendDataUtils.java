@@ -198,12 +198,17 @@ public class SendDataUtils {
 						
 						/** 判断JCheckBox */
 						if (temp.get(0).equals("4")) {
-							sb.append(jCheckBoxList.get(JCheckBoxIndex));
-							if(jCheckBoxList.size() > 1) {
-								sb.append("|");
+							if(jCheckBoxList.size() == 0) {
+								moduleData.put(key, "");
+							}else {
+								sb.append(jCheckBoxList.get(JCheckBoxIndex));
+								
+									if(jCheckBoxList.size() > 1) {
+										sb.append("|").append(jCheckBoxList.get(JCheckBoxIndex));
+									}
+								moduleData.put(key, sb.toString());
+								JCheckBoxIndex++;
 							}
-							moduleData.put(key, jCheckBoxList.get(JCheckBoxIndex));
-							JCheckBoxIndex++;
 						}
 					}
 					logger.info("封装请求参数结束");

@@ -469,6 +469,12 @@ public class SwingUtils{
 								errorlist.add(list.get(1));
 							}
 						}
+						if(list.get(0).equals("4")&& list.get(3).equals("required")) {
+							String value = (String)entry2.getValue();
+							if("".equals(value)) {
+								errorlist.add(list.get(1));
+							}
+						}
 					}
 				}
 			}
