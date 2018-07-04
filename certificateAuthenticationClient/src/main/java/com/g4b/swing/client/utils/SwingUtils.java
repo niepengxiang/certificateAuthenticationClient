@@ -116,8 +116,6 @@ public class SwingUtils{
 	 */
 	public static void createJtextField(JPanel comp,List<String> filedNameList) {
 		
-		
-		
 		if(filedNameList != null && filedNameList.size() > 0) {
 			
 				GridLayout gridLayout = new GridLayout(0, 2);
@@ -165,6 +163,8 @@ public class SwingUtils{
 				comp.add(jLabel);
 				/**创建文本框*/
 				final JTextArea jTextArea = new JTextArea();
+				jTextArea.setLineWrap(true);
+				jTextArea.setBorder(new LineBorder(new java.awt.Color(127,157,185), 1, false));
 				/**绑定坐标*/
 				jTextArea.setBounds(x+200, y, 2*w, h);
 				comp.add(jTextArea);
@@ -255,8 +255,30 @@ public class SwingUtils{
 					logger.error("创建"+filedNameList.get(1)+"多选框失败", ex);
 			}
 		}
+		
+		if(filedNameList.get(0).equals("5")) {
+				try {
+					logger.info("创建"+filedNameList.get(1)+"文件上传按钮开始");
+					JLabel jLabel = new JLabel(filedNameList.get(1)+":");
+					
+					/**绑定坐标*/
+					jLabel.setBounds(x, y, w, h);
+					comp.add(jLabel);
+					String[] split = filedNameList.get(2).split("\\.");
+					
+					JPanel jPanel = new JPanel();
+					for (String str : split) {
+						JCheckBox jCheckBox = new JCheckBox(str.split("-")[1]);
+						jPanel.add(jCheckBox);
+					}
+					jPanel.setBounds(x+200, y, 2*w, h);
+					comp.add(jPanel);
+					logger.info("创建"+filedNameList.get(1)+"多选框结束");
+				}catch (Exception ex) {
+					logger.error("创建"+filedNameList.get(1)+"多选框失败", ex);
+			}
+		}
 	}
-	
 	
 	
 	/***
