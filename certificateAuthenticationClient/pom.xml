@@ -11,6 +11,7 @@
 		<htttpClient.version>4.5.2</htttpClient.version>
 		<log4j.version>1.2.17</log4j.version>
 		<jackJson.version>2.9.5</jackJson.version>
+		<poi.version>3.9</poi.version>
 	</properties>
 
 	<dependencies>
@@ -51,7 +52,7 @@
 			<version>3.0</version>
 		</dependency>
 		<!-- end -->
-	
+
 		<!-- JackJson start -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -69,6 +70,18 @@
 			<version>${jackJson.version}</version>
 		</dependency>
 		<!-- end -->
+		<!-- apache poi start -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>${poi.version}</version>
+		</dependency>
 		
+		<dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
+		</dependency>
+		<!-- end -->
 	</dependencies>
 </project>
