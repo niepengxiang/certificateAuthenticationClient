@@ -8,6 +8,7 @@ import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,18 +19,20 @@ import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
@@ -53,9 +56,9 @@ public class SwingUtils{
 	/**
 	 * @Title: createTitledBorder  
 	 * @Description: TODO 创建标题栏
-	 * @param @param jFrame      顶层窗口
-	 * @param @param TitleBorder 标签栏
-	 * @param @param tabName     标签名称
+	 * @param  jFrame      顶层窗口
+	 * @param  TitleBorder 标签栏
+	 * @param  tabName     标签名称
 	 */
 	public static JPanel createTitledBorder(JTabbedPane jTabbedPane,JPanel comp,String tabName){
 			JPanel titleBorder = new JPanel();
@@ -77,7 +80,7 @@ public class SwingUtils{
 	/**
 	 * @Title: setScreenCenter  
 	 * @Description: TODO 设置弹出框在屏幕中心  
-	 * @param @param jFrame 顶层窗口
+	 * @param  jFrame 顶层窗口
 	 * @return void      
 	 */
 	public static void setScreenCenter(JFrame jFrame){
@@ -104,6 +107,7 @@ public class SwingUtils{
 	}
 	
 	/**
+	 * @param valuesSize 
 	 * @Title: createJtextField  
 	 * @Description: TODO 创建组件文本框靠右显示,根据属性配置文件显示不同的组件  
 	 * @param @param orgCerdentialTitle 标签栏的水平图
@@ -111,116 +115,263 @@ public class SwingUtils{
 	 * @return void  
 	 */
 	public static void createJtextField(JPanel comp,List<String> filedNameList) {
+		
+		
+		
 		if(filedNameList != null && filedNameList.size() > 0) {
-			/**设置布局为流式布局,在北间*/
-			//comp.setBorder(new EmptyBorder(5, 5, 5, 5));
-			//comp.setLayout(new BorderLayout(0, 0));
 			
-			//comp.add(jScrollPane, BorderLayout.CENTER);
-			//jPanel.add(jScrollPane, BorderLayout.CENTER);
-			/**判断是否是文本框组件*/
-			if( filedNameList.get(0).equals("0")) {
-				try {
-					logger.info("创建"+filedNameList.get(1)+"文本框开始");
-					GridLayout gridLayout = new GridLayout(0, 2);
-					
-					/**设置布局,网格布局*/
-					comp.setLayout(gridLayout);
-					
-					/**创建标签*/
-					JLabel jLabel = new JLabel(filedNameList.get(1)+":",SwingConstants.TRAILING);
-					
-					/**设置标签居中*/
-					jLabel.setHorizontalAlignment(JLabel.CENTER);
-					comp.add(jLabel);
-					
-					/**创建文本框*/
-					final JTextField field = new JTextField(50);
-										
-					comp.add(field);
-					 
-					logger.info("创建"+filedNameList.get(1)+"文本框结束");
-				}catch(Exception ex) {
-					logger.error("创建"+filedNameList.get(1)+"文本框失败", ex);
-				}
+				GridLayout gridLayout = new GridLayout(0, 2);
+				/**设置布局,网格布局*/
+				comp.setLayout(gridLayout);
+				createSwingModule(comp, filedNameList);
 			}
-			
-			/**判断是否是单选按钮组件*/
-			if(filedNameList.get(0).equals("1")) {
-				String opt = null;
-				try {
-					logger.info("创建"+filedNameList.get(1)+"单选框开始");
-					/**创建标签*/
-					JLabel jLabel = new JLabel(filedNameList.get(1)+":",SwingConstants.TRAILING);
+	}
+	public static void createJtextField(JPanel comp,List<String> filedNameList,int index) {
+		int x = 30;
+		int y = 30*index;
+		int w = 200;
+		int h = 25;
+		comp.setLayout(null);
+		/**判断是否是文本框组件*/
+		if( filedNameList.get(0).equals("0")) {
+			try {
+				logger.info("创建"+filedNameList.get(1)+"文本框开始");
+				
+				/**创建标签*/
+				JLabel jLabel = new JLabel(filedNameList.get(1)+":");
+				/**绑定坐标*/
+				jLabel.setBounds(x, y, w, h);
+				comp.add(jLabel);
+				
+				/**创建文本框*/
+				final JTextField field = new JTextField(50);
+				/**绑定坐标*/
+				field.setBounds(x+200, y, 2*w, h);
+				comp.add(field);
+				logger.info("创建"+filedNameList.get(1)+"文本框结束");
+			}catch(Exception ex) {
+				logger.error("创建"+filedNameList.get(1)+"文本框失败", ex);
+			}
+		}
+		/**判断是否是文本域组件*/
+		if( filedNameList.get(0).equals("1")) {
+			try {
+				logger.info("创建"+filedNameList.get(1)+"文本框开始");
+				
+				/**创建标签*/
+				JLabel jLabel = new JLabel(filedNameList.get(1)+":");
+				/**绑定坐标*/
+				jLabel.setBounds(x, y, w, h);
+				comp.add(jLabel);
+				/**创建文本框*/
+				final JTextArea jTextArea = new JTextArea();
+				/**绑定坐标*/
+				jTextArea.setBounds(x+200, y, 2*w, h);
+				comp.add(jTextArea);
+				logger.info("创建"+filedNameList.get(1)+"文本框结束");
+			}catch(Exception ex) {
+				logger.error("创建"+filedNameList.get(1)+"文本框失败", ex);
+			}
+		}
+		
+		/**判断是否是单选按钮组件*/
+		if(filedNameList.get(0).equals("2")) {
+			String opt = null;
+			try {
+				logger.info("创建"+filedNameList.get(1)+"单选框开始");
+				/**创建标签*/
+				JLabel jLabel = new JLabel(filedNameList.get(1)+":");
+				/**绑定坐标*/
+				jLabel.setBounds(x, y, w, h);
+				comp.add(jLabel);
+				
+				/**创建单选框的水平图*/
+				JPanel raidaoButtonJPanel = new JPanel();
+				/**绑定坐标*/
+				raidaoButtonJPanel.setBounds(x+200, y, 2*w, h);
+				comp.add(raidaoButtonJPanel);
+				String reqOptStr = filedNameList.get(2);
+				String[] reqOpt = reqOptStr.split("\\.");
+				
+				/**创建单选按钮管理器,控制单选*/
+				ButtonGroup group = new ButtonGroup();
+				
+				for (String str : reqOpt) {
+					opt = str.split("-")[1];
+					logger.info("创建"+opt+"单选框内容开始");
+					final JRadioButton jRadioButton = new JRadioButton(opt);
+					group.add(jRadioButton);
+					raidaoButtonJPanel.add(jRadioButton);
+					logger.info("创建"+opt+"单选框内容结束");
+				}
+				
+				logger.info("创建"+filedNameList.get(1)+"单选框结束");
+			}catch(Exception ex) {
+				logger.error("创建"+opt+"内容单选框内容失败",ex);
+			}
+		}
+		
+		if(filedNameList.get(0).equals("3")) {
+			String opt = null;
+			try {
+				logger.info("创建"+filedNameList.get(1)+"下拉框开始");
+				/**创建标签*/
+				JLabel jLabel = new JLabel(filedNameList.get(1)+":");
+				
+				/**绑定坐标*/
+				jLabel.setBounds(x, y, w, h);
+				comp.add(jLabel);
+				
+				String credentialTypeStr = filedNameList.get(2);
+				String[] credentialTypes = credentialTypeStr.split("\\.");
+				JComboBox<String> jComboBox = new JComboBox<>(credentialTypes);
+				/**绑定坐标*/
+				jComboBox.setBounds(x+200, y, 2*w, h);
+				comp.add(jComboBox);
+				logger.info("创建"+filedNameList.get(1)+"下拉框结束");
+			}catch(Exception ex) {
+				logger.error("创建"+opt+"下拉框内容失败",ex);
+			}
+		}
+		if(filedNameList.get(0).equals("4")) {
+			try {
+					logger.info("创建"+filedNameList.get(1)+"多选框开始");
+					JLabel jLabel = new JLabel(filedNameList.get(1)+":");
 					
-					/**设置标签居中*/
-					jLabel.setHorizontalAlignment(JLabel.CENTER);
+					/**绑定坐标*/
+					jLabel.setBounds(x, y, w, h);
 					comp.add(jLabel);
+					String[] split = filedNameList.get(2).split("\\.");
 					
-					/**创建单选框的水平图*/
-					JPanel raidaoButtonJPanel = new JPanel();
-					comp.add(raidaoButtonJPanel);
-					String reqOptStr = filedNameList.get(2);
-					String[] reqOpt = reqOptStr.split("\\.");
-					
-					/**创建单选按钮管理器,控制单选*/
-					ButtonGroup group = new ButtonGroup();
-					
-					for (String str : reqOpt) {
-						opt = str.split("_")[1];
-						logger.info("创建"+opt+"单选框内容开始");
-						final JRadioButton jRadioButton = new JRadioButton(opt);
-						group.add(jRadioButton);
-						raidaoButtonJPanel.add(jRadioButton);
-						logger.info("创建"+opt+"单选框内容结束");
+					JPanel jPanel = new JPanel();
+					for (String str : split) {
+						JCheckBox jCheckBox = new JCheckBox(str.split("-")[1]);
+						jPanel.add(jCheckBox);
 					}
-					
-					logger.info("创建"+filedNameList.get(1)+"单选框结束");
-				}catch(Exception ex) {
-					logger.error("创建"+opt+"内容单选框内容失败",ex);
-				}
+					jPanel.setBounds(x+200, y, 2*w, h);
+					comp.add(jPanel);
+					logger.info("创建"+filedNameList.get(1)+"多选框结束");
+				}catch (Exception ex) {
+					logger.error("创建"+filedNameList.get(1)+"多选框失败", ex);
 			}
-			
-			if(filedNameList.get(0).equals("2")) {
-				String opt = null;
-				try {
-					logger.info("创建"+filedNameList.get(1)+"下拉框开始");
-					/**创建标签*/
-					JLabel jLabel = new JLabel(filedNameList.get(1)+":",SwingConstants.TRAILING);
-					
-					/**设置标签居中*/
-					jLabel.setHorizontalAlignment(JLabel.CENTER);
-					comp.add(jLabel);
-					
-					String credentialTypeStr = filedNameList.get(2);
-					String[] credentialTypes = credentialTypeStr.split("\\.");
-					JComboBox<String> jComboBox = new JComboBox<>(credentialTypes);
-					comp.add(jComboBox);
-					logger.info("创建"+filedNameList.get(1)+"下拉框结束");
-				}catch(Exception ex) {
-					logger.error("创建"+opt+"下拉框内容失败",ex);
-				}
+		}
+	}
+	
+	
+	
+	/***
+	 * @Title: createSwingModule  
+	 * @Description: 抽取方法  
+	 * @param  comp
+	 * @param  filedNameList   
+	 * @return void    
+	 */
+	private static void createSwingModule(JPanel comp, List<String> filedNameList) {
+		/**判断是否是文本框组件*/
+		if( filedNameList.get(0).equals("0")) {
+			try {
+				logger.info("创建"+filedNameList.get(1)+"文本框开始");
+				
+				/**创建标签*/
+				JLabel jLabel = new JLabel(filedNameList.get(1)+":",SwingConstants.TRAILING);
+				
+				/**设置标签居中*/
+				jLabel.setHorizontalAlignment(JLabel.CENTER);
+				comp.add(jLabel);
+				
+				/**创建文本框*/
+				final JTextField field = new JTextField(50);
+				comp.add(field);
+				 
+				logger.info("创建"+filedNameList.get(1)+"文本框结束");
+			}catch(Exception ex) {
+				logger.error("创建"+filedNameList.get(1)+"文本框失败", ex);
 			}
-			
-			
-			//jScrollPane.setViewportView(comp);
-			//设置垂直滚动条的显示: 一直显示
-			//jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-	        //设置横向滚动条的显示: 当需要的时候显示
-			//jScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-			//参数说明:
-	        //AS_NEEDED 需要的时候显示
-	        //ALWAYS    一直显示
-	        //NEVER     绝不显示
+		}
+		/**判断是否是文本域组件*/
+		if( filedNameList.get(0).equals("1")) {
+			try {
+				logger.info("创建"+filedNameList.get(1)+"文本框开始");
+				
+				/**创建标签*/
+				JLabel jLabel = new JLabel(filedNameList.get(1)+":",SwingConstants.TRAILING);
+				/**设置标签居中*/
+				jLabel.setHorizontalAlignment(JLabel.CENTER);
+				comp.add(jLabel);
+				/**创建文本框*/
+				final JTextArea jTextArea = new JTextArea();
+				jTextArea.setLineWrap(true);
+				jTextArea.setBorder(new LineBorder(new java.awt.Color(127,157,185), 1, false));
+				comp.add(jTextArea);
+				logger.info("创建"+filedNameList.get(1)+"文本框结束");
+			}catch(Exception ex) {
+				logger.error("创建"+filedNameList.get(1)+"文本框失败", ex);
+			}
+		}
+		/**判断是否是单选按钮组件*/
+		if(filedNameList.get(0).equals("2")) {
+			String opt = null;
+			try {
+				logger.info("创建"+filedNameList.get(1)+"单选框开始");
+				/**创建标签*/
+				JLabel jLabel = new JLabel(filedNameList.get(1)+":",SwingConstants.TRAILING);
+				
+				/**设置标签居中*/
+				jLabel.setHorizontalAlignment(JLabel.CENTER);
+				comp.add(jLabel);
+				
+				/**创建单选框的水平图*/
+				JPanel raidaoButtonJPanel = new JPanel();
+				comp.add(raidaoButtonJPanel);
+				String reqOptStr = filedNameList.get(2);
+				String[] reqOpt = reqOptStr.split("\\.");
+				
+				/**创建单选按钮管理器,控制单选*/
+				ButtonGroup group = new ButtonGroup();
+				
+				for (String str : reqOpt) {
+					opt = str.split("-")[1];
+					logger.info("创建"+opt+"单选框内容开始");
+					final JRadioButton jRadioButton = new JRadioButton(opt);
+					group.add(jRadioButton);
+					raidaoButtonJPanel.add(jRadioButton);
+					logger.info("创建"+opt+"单选框内容结束");
+				}
+				
+				logger.info("创建"+filedNameList.get(1)+"单选框结束");
+			}catch(Exception ex) {
+				logger.error("创建"+opt+"内容单选框内容失败",ex);
+			}
+		}
+		
+		if(filedNameList.get(0).equals("3")) {
+			String opt = null;
+			try {
+				logger.info("创建"+filedNameList.get(1)+"下拉框开始");
+				/**创建标签*/
+				JLabel jLabel = new JLabel(filedNameList.get(1)+":",SwingConstants.TRAILING);
+				
+				/**设置标签居中*/
+				jLabel.setHorizontalAlignment(JLabel.CENTER);
+				comp.add(jLabel);
+				
+				String credentialTypeStr = filedNameList.get(2);
+				String[] credentialTypes = credentialTypeStr.split("\\.");
+				JComboBox<String> jComboBox = new JComboBox<>(credentialTypes);
+				comp.add(jComboBox);
+				logger.info("创建"+filedNameList.get(1)+"下拉框结束");
+			}catch(Exception ex) {
+				logger.error("创建"+opt+"下拉框内容失败",ex);
+			}
 		}
 	}
 	
 	/**
 	 * @Title: createJBotton  
 	 * @Description: TODO 常见按钮,按钮在最下方  
-	 * @param @param jFrame     顶层窗口
-	 * @param @param bottonName 按钮名称
-	 * @param @param color    	按钮背景色,可为null背景为默认
+	 * @param  jFrame     顶层窗口
+	 * @param  bottonName 按钮名称
+	 * @param  color      按钮背景色,可为null背景为默认
 	 * @return void
 	 */
 	public static JButton createJBotton(JPanel jpanl,String bottonName,Color color) {
@@ -243,7 +394,7 @@ public class SwingUtils{
 	/**
 	 * @Title: getMap  
 	 * @Description: TODO 获取内容
-	 * @param @param fileName 文件名称
+	 * @param  fileName 文件名称
 	 * @return Map<String,Object>  Map
 	 */
 	public static Map<String,Object> getMap(String fileName) {
@@ -274,14 +425,15 @@ public class SwingUtils{
 	/**
 	 * @Title: verifyRequired  
 	 * @Description: TODO 验证必填项
-	 * @param @param mapData     属性文件
-	 * @param @param component   组件父类
+	 * @param  mapData     属性文件
+	 * @param  component   组件父类
 	 * @return void  
 	 */
 	@SuppressWarnings("unchecked")
-	public static boolean verifyRequired(Map<String,Object> mapData,Map<String,Object >moduleData) {
+	public static List<String> verifyRequired(Map<String,Object> mapData,Map<String,Object >moduleData) {
+		
+		List<String> errorlist = new ArrayList<>();
 		logger.info("验证必填项开始");
-		boolean flag = true;
 		try {
 			Set<Entry<String,Object>> entrySet = mapData.entrySet();
 			
@@ -293,24 +445,28 @@ public class SwingUtils{
 						if(list.get(0).equals("0") && list.get(2).equals("required")) {
 							String value = (String)entry2.getValue();
 							if("".equals(value)) {
-								JOptionPane.showMessageDialog(null, list.get(1)+"不能为空", "提示框", JOptionPane.WARNING_MESSAGE);
-								flag = false;
+								errorlist.add(list.get(1));
 							}
 						}
 						
-						if(list.get(0).equals("1") && list.get(3).equals("required")) {
+						if(list.get(0).equals("1") && list.get(2).equals("required")) {
 							String value = (String)entry2.getValue();
 							if("".equals(value)) {
-								JOptionPane.showMessageDialog(null, list.get(1)+"不能为空", "提示框", JOptionPane.WARNING_MESSAGE);
-								flag = false;
+								errorlist.add(list.get(1));
 							}
 						}
 						
 						if(list.get(0).equals("2") && list.get(3).equals("required")) {
 							String value = (String)entry2.getValue();
 							if("".equals(value)) {
-								JOptionPane.showMessageDialog(null, list.get(1)+"不能为空", "提示框", JOptionPane.WARNING_MESSAGE);
-								flag = false;
+								errorlist.add(list.get(1));
+							}
+						}
+						
+						if(list.get(0).equals("3") && list.get(3).equals("required")) {
+							String value = (String)entry2.getValue();
+							if("".equals(value)) {
+								errorlist.add(list.get(1));
 							}
 						}
 					}
@@ -320,14 +476,14 @@ public class SwingUtils{
 		}catch (Exception ex) {
 			logger.error("验证必填项错误",ex);
 		}
-		return flag;
+		return errorlist;
 	}
 	
 	/**
 	 * @Title: addJScrollPane  
 	 * @Description: TODO 添加滾動條
-	 * @param @param orgCerdentialComp
-	 * @param @param orgCerdentialTitle    参数  
+	 * @param  orgCerdentialComp
+	 * @param  orgCerdentialTitle    参数  
 	 * @return void    返回类型  
 	 * @throws
 	 */
@@ -339,8 +495,12 @@ public class SwingUtils{
         jScrollPane.setPreferredSize(new Dimension(1000, 800));
         orgCerdentialTitle.add(jScrollPane,BorderLayout.CENTER);
         //设置垂直滚动条的显示: 一直显示
-  		jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+  		jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
           //设置横向滚动条的显示: 当需要的时候显示
-  		jScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+  		jScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+  		//参数说明:
+        //AS_NEEDED 需要的时候显示
+        //ALWAYS    一直显示
+        //NEVER     绝不显示
 	}
 }

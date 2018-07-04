@@ -1,10 +1,9 @@
 package com.g4b.swing.client.pojo;
 /**
- * 响应实体
- * @author LEE.SIU.WAH
- * @email lixiaohua7@163.com
- * @date 2017年6月25日 上午11:24:37
- * @version 1.0
+ * @ClassName: HttpResponseEntity  
+ * @Description: TODO(这里用一句话描述这个类的作用)  
+ * @author NiePengXiang
+ * @date 2018年7月4日  
  */
 public class HttpResponseEntity {
 	/** 定义响应状态码 */
