@@ -1,7 +1,7 @@
 package com.g4b.swing.client.pojo;
 /**
  * @ClassName: HttpResponseEntity  
- * @Description: TODO(这里用一句话描述这个类的作用)  
+ * @Description: TODO HTTP返回实体类
  * @author NiePengXiang
  * @date 2018年7月4日  
  */

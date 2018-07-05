@@ -29,15 +29,6 @@ import org.apache.log4j.Logger;
  */
 public class SendDataUtils {
 	
-	/**定义操作的常量*/
-	private static final String REQOPT = "reqOpt";
-	
-	private static final String ADD = "i";
-	
-	private static final String UPDATE = "u";
-	
-	private static final String DELETE = "d";
-	
 	private static Logger logger = Logger.getLogger(SendDataUtils.class);
 	/***
 	 * @Title: getModuleDataAndSend  
@@ -97,13 +88,15 @@ public class SendDataUtils {
 									/**封装选择值对于的参数值*/
 									Collection<Object> values = mapData.values();
 									for (Object object : values) {
-										List<String> strList = (List<String>) object;
-										if(strList.get(2).contains(text)){
-											String[] split = strList.get(2).split("\\.");
-											for (String str : split) {
-												if(str.contains(text)) {
-													String[] st = str.split("-");
-													jRadioList.add(st[0]);
+										if(object instanceof List) {
+											List<String> strList = (List<String>) object;
+											if(strList.get(2).contains(text)){
+												String[] split = strList.get(2).split("\\.");
+												for (String str : split) {
+													if(str.contains(text)) {
+														String[] st = str.split("-");
+														jRadioList.add(st[0]);
+													}
 												}
 											}
 										}
@@ -119,13 +112,15 @@ public class SendDataUtils {
 									/**封装选择值对于的参数值*/
 									Collection<Object> values = mapData.values();
 									for (Object object : values) {
-										List<String> strList = (List<String>) object;
-										if(strList.get(2).contains(text)){
-											String[] split = strList.get(2).split("\\.");
-											for (String str : split) {
-												if(str.contains(text)) {
-													String[] st = str.split("-");
-													jCheckBoxList.add(st[0]);
+										if(object instanceof List) {
+											List<String> strList = (List<String>) object;
+											if(strList.get(2).contains(text)){
+												String[] split = strList.get(2).split("\\.");
+												for (String str : split) {
+													if(str.contains(text)) {
+														String[] st = str.split("-");
+														jCheckBoxList.add(st[0]);
+													}
 												}
 											}
 										}
@@ -144,13 +139,15 @@ public class SendDataUtils {
 						/**封装选择值对于的参数值*/
 						Collection<Object> values = mapData.values();
 						for (Object object : values) {
-							List<String> strList = (List<String>) object;
-							if(strList.get(2).contains(item)) {
-								String[] split = strList.get(2).split("\\.");
-									for (String str : split) {
-										if(str.contains(item)) {
-											String[] st = str.split("-");
-											jComboBoxList.add(st[0]);
+							if(object instanceof List) {
+								List<String> strList = (List<String>) object;
+								if(strList.get(2).contains(item)) {
+									String[] split = strList.get(2).split("\\.");
+										for (String str : split) {
+											if(str.contains(item)) {
+												String[] st = str.split("-");
+												jComboBoxList.add(st[0]);
+											}
 										}
 									}
 								}
@@ -168,46 +165,48 @@ public class SendDataUtils {
 					logger.info("封装请求参数开始");
 					/** 迭代所有的key */
 					for (String key : keySet) {
-						List<String> temp = (List<String>) mapData.get(key);
-						/** 判断Jtext */
-						if (temp.get(0).equals("0")) {
-							moduleData.put(key, jTextList.get(jTextIndex));
-							jTextIndex++;
-						}
-						
-						if(temp.get(0).equals("1")) {
-							moduleData.put(key, jtextAreaList.get(jTextAreaIndex));
-							jTextAreaIndex++;
-						}
-						
-						/** 判断JRadio */
-						if (temp.get(0).equals("2")) {
-							if (jRadioIndex < jRadioList.size()) {
-								moduleData.put(key, jRadioList.get(jRadioIndex));
-								jRadioIndex++;
-							} else {
-								moduleData.put(key, "");
+						if( mapData.get(key) instanceof List) {
+							List<String> temp = (List<String>) mapData.get(key);
+							/** 判断Jtext */
+							if (temp.get(0).equals("0")) {
+								moduleData.put(key, jTextList.get(jTextIndex));
+								jTextIndex++;
 							}
-						}
-	
-						/** 判断JComboBox */
-						if (temp.get(0).equals("3")) {
-							moduleData.put(key, jComboBoxList.get(jComboBoxIndex));
-							jComboBoxIndex++;
-						}
-						
-						/** 判断JCheckBox */
-						if (temp.get(0).equals("4")) {
-							if(jCheckBoxList.size() == 0) {
-								moduleData.put(key, "");
-							}else {
-								sb.append(jCheckBoxList.get(JCheckBoxIndex));
-								
-									if(jCheckBoxList.size() > 1) {
-										sb.append("|").append(jCheckBoxList.get(JCheckBoxIndex));
-									}
-								moduleData.put(key, sb.toString());
-								JCheckBoxIndex++;
+							
+							if(temp.get(0).equals("1")) {
+								moduleData.put(key, jtextAreaList.get(jTextAreaIndex));
+								jTextAreaIndex++;
+							}
+							
+							/** 判断JRadio */
+							if (temp.get(0).equals("2")) {
+								if (jRadioIndex < jRadioList.size()) {
+									moduleData.put(key, jRadioList.get(jRadioIndex));
+									jRadioIndex++;
+								} else {
+									moduleData.put(key, "");
+								}
+							}
+		
+							/** 判断JComboBox */
+							if (temp.get(0).equals("3")) {
+								moduleData.put(key, jComboBoxList.get(jComboBoxIndex));
+								jComboBoxIndex++;
+							}
+							
+							/** 判断JCheckBox */
+							if (temp.get(0).equals("4")) {
+								if(jCheckBoxList.size() == 0) {
+									moduleData.put(key, "");
+								}else {
+									sb.append(jCheckBoxList.get(JCheckBoxIndex));
+									
+										if(jCheckBoxList.size() > 1) {
+											sb.append("|").append(jCheckBoxList.get(JCheckBoxIndex));
+										}
+									moduleData.put(key, sb.toString());
+									JCheckBoxIndex++;
+								}
 							}
 						}
 					}
@@ -226,27 +225,47 @@ public class SendDataUtils {
 					JOptionPane.showMessageDialog(null, buffer.toString(), "提示框", JOptionPane.WARNING_MESSAGE);
 				
 				}else {
-					/**获取操作项*/
-					String value = (String)moduleData.get(REQOPT);
-					if(value.equals(ADD)) {
-						
-						/**发送Post请求*/
-						httpClientService.sendPost("", moduleData, true);
-					}
 					
-					if(value.equals(UPDATE)) {
-						
-						/**发送Get请求*/
-						httpClientService.sendPut("", moduleData, true);			
-					}
+					Map<String,Object> sendMap = new HashMap<>();
+					sendMap.put("transContent", moduleData);
+					sendRquest(httpClientService, sendMap);
 					
-					if(value.equals(DELETE)) {
-						
-						/**发送Delete请求*/
-						httpClientService.sendDelete("", moduleData);
-					}
+					
+					
 				}
 			}
+			
+			
 		});
 	}
+	
+	public static void sendRquest(HttpClientService httpClientService, Map<String, Object> sendData) {
+		
+		@SuppressWarnings("unchecked")
+		List<Map<String,Object>> moduleData = (List<Map<String, Object>>) sendData.get("transContent");
+		
+		logger.info("发送请求开始");
+		for (Map<String, Object> map : moduleData) {
+			Object certStatusObj = map.get("certStatus");
+			if(certStatusObj != null) {
+				try {
+					map.put("cerStatus", (Integer.parseInt((String)certStatusObj)));
+				}catch (Exception e) {
+					logger.error("cerStatus值字符串转int类型转换错误");
+				}
+			}
+			Object accessCtrlOptObj = map.get("accessCtrlOpt");
+			if(accessCtrlOptObj != null) {
+				try {
+					map.put("accessCtrlOpt", (Integer.parseInt((String)certStatusObj)));
+				}catch (Exception ex) {
+					logger.error("accessCtrlOpt值字符串转int类型转换错误",ex);
+				}
+			}
+		}
+		httpClientService.sendPost("", sendData, false);
+		
+		logger.info("发送请求结束");
+	}
+	
 }

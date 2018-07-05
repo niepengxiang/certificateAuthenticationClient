@@ -5,10 +5,13 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,8 +24,10 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -37,6 +42,8 @@ import javax.swing.border.LineBorder;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.log4j.Logger;
+
+import com.g4b.swing.client.filter.ExcelFileFilter;
 
 /**
  * @ClassName: SwingUtils  
@@ -530,5 +537,90 @@ public class SwingUtils{
         //AS_NEEDED 需要的时候显示
         //ALWAYS    一直显示
         //NEVER     绝不显示
+	}
+	
+	/**
+	 * @Title: fileInputJbuttonClick
+	 * @Description: TODO 文件上传按钮点击事件,封住数据参数
+	 * @param  jFrame      	顶层容器
+	 * @param  mapData	   	属性文件读取数据
+	 * @param  jTextArea	文件上传名称显示框
+	 * @param  jButton   	文件上传按钮
+	 * @return void  
+	 */
+	public static void fileInputJbuttonClick(JFrame jFrame, Map<String, Object> mapData,
+			JTextArea jTextArea, JButton jButton,Set<String> set,List<Map<String,Object>> ListModule,String classification) {
+		/**为文件表单按钮组件添加点击事件*/
+		jButton.addMouseListener(new MouseAdapter() {
+        	
+        	@SuppressWarnings("unchecked")
+			@Override
+        	public void mouseClicked(MouseEvent e) {
+        		JFileChooser jFileChooser = new JFileChooser();
+        		jFileChooser.setMultiSelectionEnabled(true);
+        		ExcelFileFilter fileFilter = new ExcelFileFilter();
+        		jFileChooser.setFileFilter(fileFilter);
+        		
+        		
+				int dialog = jFileChooser.showOpenDialog(jFrame);
+				if(dialog == JFileChooser.APPROVE_OPTION) {
+					/** 得到选择的文件,支持批量上传**/
+					File[] arrfiles = jFileChooser.getSelectedFiles();
+					if (arrfiles == null || arrfiles.length == 0) {
+						return;
+					}
+					
+					try {
+						logger.info("文件数据读取开始");
+						for (File file : arrfiles) {
+							String firstCellValue = ReadExcelTools.getFirstCellValue(file);
+							if(classification != null && !classification.equals(firstCellValue)) {
+								JOptionPane.showMessageDialog(null, "不是该证书类型", "提示框", JOptionPane.WARNING_MESSAGE);
+								continue;
+							}
+							
+							
+							if(set.contains(file.getName())) {
+								JOptionPane.showMessageDialog(null, "已添加该文件", "提示框", JOptionPane.WARNING_MESSAGE);
+								continue;
+							}
+							
+							/**添加到Set集合*/
+							set.add(file.getName());
+							
+							List<String[]> readExcel = ReadExcelTools.readExcel(file);
+							Set<Entry<String,Object>> entrySet = mapData.entrySet();
+							Map<String,Object> mapModule = new HashMap<>();
+							for (Entry<String,Object> entry : entrySet) {
+								for (String[] arrStr : readExcel) {
+									if(((List<String>)entry.getValue()).get(1).equals(arrStr[0])) {
+										mapModule.put(entry.getKey(), arrStr[1]);
+									}
+								}
+								
+							}
+							mapModule.put("fileName", file.getName());
+							ListModule.add(mapModule);
+						}
+						Iterator<String> iterator = set.iterator();
+						
+						StringBuffer stringBuffer = new StringBuffer();
+						int i = 0;
+						while(iterator.hasNext()) {
+							if(i > 0) {
+								stringBuffer.append(",");
+							}
+							stringBuffer.append(iterator.next());
+							i++;
+						}
+						jTextArea.setText(stringBuffer.toString());
+						
+						logger.info("文件数据读取结束");
+					} catch (Exception ex) {
+						logger.error("文件上传失败",ex);
+					} 
+				}
+        	}
+		});
 	}
 }

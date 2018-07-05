@@ -2,27 +2,22 @@ package com.g4b.swing.client;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
 import javax.swing.border.LineBorder;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.log4j.Logger;
 
@@ -50,6 +45,16 @@ public class Client extends ConfigProperties {
 	private static final String CA_CREDENTIAL_TITLE = loadder("CA_CREDENTIAL_TITLE");
 	
 	private static final String FILE_INPUT_DATA = loadder("FILE_INPUT_DATA");
+	
+	private static List<Map<String,Object>> orgCredentialListModule = new ArrayList<>();
+	
+	private static List<Map<String,Object>> orgPersonListModule = new ArrayList<>();
+	
+	private static List<Map<String,Object>> caPersonListModule = new ArrayList<>();
+	
+	private static List<Map<String,Object>> caCredentialListModule = new ArrayList<>();
+	
+	private static Set<String> set = new HashSet<>();
 	
 	private static HttpClientService httpClientService = new HttpClientService();
 	
@@ -83,7 +88,9 @@ public class Client extends ConfigProperties {
         /**迭代机构证书属性文件的Value，循环创建Swing组件*/
 		Collection<Object> values = orgCerdentialData.values();
 		for (Object value : values) {
-			SwingUtils.createJtextField(orgCerdentialComp,(List<String>)value);
+			if(value instanceof List) {
+				SwingUtils.createJtextField(orgCerdentialComp,(List<String>)value);
+			}
 		}
 		
         
@@ -108,7 +115,9 @@ public class Client extends ConfigProperties {
 		/**迭代机构证书属性文件的Value，循环创建Swing组件*/
 		Collection<Object> opcdValue = orgPersionCredentialData.values();
 		for (Object value : opcdValue) {
-				SwingUtils.createJtextField(orgPersionCredentialCom, (List<String>)value);
+				if(value instanceof List) {
+					SwingUtils.createJtextField(orgPersionCredentialCom, (List<String>)value);
+				}
 		}
        
 		SwingUtils.addJScrollPane(orgPersionCredentialCom, orgPersionCredentialTitle);
@@ -134,8 +143,10 @@ public class Client extends ConfigProperties {
 		Collection<Object> caPersonValue = caPersonData.values();
 		int caPersionIndex = 1;
 		for (Object value : caPersonValue) {
+			if(value instanceof List) {
 				SwingUtils.createJtextField(caPersonCom, (List<String>)value,caPersionIndex);
 				caPersionIndex ++;
+			}
 		}
        
 		SwingUtils.addJScrollPane(caPersonCom, caPersonTitled);
@@ -158,8 +169,10 @@ public class Client extends ConfigProperties {
 		Collection<Object> caCredentialValues = caCredentialData.values();
 		int caCredentialIndex = 1;
 		for (Object value : caCredentialValues) {
+			if(value instanceof List) {
 				SwingUtils.createJtextField(caCredentialCom, (List<String>)value,caCredentialIndex);
 				caCredentialIndex ++;
+			}
 		}
 		
 		/**创建垂直滚动条，在需要的时候的显示*/
@@ -192,94 +205,85 @@ public class Client extends ConfigProperties {
 				orgPersionCdtButton, caPersionJtextArea, caPersionButtion, caCredentialJtextArea,
 				caCredentialFiledButton);
         
-        /**为文件表单按钮组件添加点击事件*/
-        orgCdtFiledButton.addMouseListener(new MouseAdapter() {
-        	
-        	@Override
-        	public void mouseClicked(MouseEvent e) {
-        		JFileChooser jFileChooser = new JFileChooser();
-        		jFileChooser.setMultiSelectionEnabled(true);
-				int dialog = jFileChooser.showOpenDialog(jFrame);
-				if(dialog == JFileChooser.APPROVE_OPTION) {
-					/** 得到选择的文件* */
-					File[] arrfiles = jFileChooser.getSelectedFiles();
-					if (arrfiles == null || arrfiles.length == 0) {
-						return;
-					}
-					FileInputStream input = null;
-					try {
-						for (File f : arrfiles) {
-							/** 目标文件夹 **/
-							HashSet<String> set = new HashSet<String>();
-							/** 判断是否已有该文件* */
-							if (set.contains(f.getName())) {
-								JOptionPane.showMessageDialog(new JDialog(), "已有该文件！");
-								return;
-							}
-							input = new FileInputStream(f);
-						}
-					} catch (Exception ex) {
-						logger.error("文件上传失败",ex);
-					} 
-				}
-        	}
-        	
-		});
-        
-        
-        
-        
-        
-        orgPersionCdtButton.addActionListener(new ActionListener() {
-					
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						
-						
-					}
-				});
-        caPersionButtion.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				
-				
-			}
-		});
-        caCredentialFiledButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				
-				
-			}
-		});
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+        /**机构证书文件上传按钮点击事件,封住数据参数*/
+        SwingUtils.fileInputJbuttonClick(jFrame, orgCerdentialData, orgCdtJtextArea, orgCdtFiledButton,set,orgCredentialListModule,ORG_CREDENTIAL_TITLE);
+        /**个人非机构证书文件上传按钮点击事件,封住数据参数*/
+        SwingUtils.fileInputJbuttonClick(jFrame, orgPersionCredentialData, orgPersionJtextArea, orgPersionCdtButton,set,orgPersonListModule,ORG_PERSON_CREDENTIAL_TITLE);
+        /**CA用户证书文件上传按钮点击事件,封住数据参数*/
+        SwingUtils.fileInputJbuttonClick(jFrame, caPersonData, caPersionJtextArea, caPersionButtion,set,caPersonListModule,CA_PERSON_TITLE);
+        /**CA证书链证书文件上传按钮点击事件,封住数据参数*/
+        SwingUtils.fileInputJbuttonClick(jFrame, caCredentialData, caCredentialJtextArea, caCredentialFiledButton,set,caCredentialListModule,CA_CREDENTIAL_TITLE);
         
         /**创建垂直滚动条，在需要的时候的显示*/
 		SwingUtils.addJScrollPane(fileInputCom, filedInputTitled);
         
 		/**创建提交按钮*/
 		JButton fileInputJButton = SwingUtils.createJBotton(filedInputTitled, "提交",null);
-        
+		fileInputJButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					if(orgCredentialListModule != null && orgCredentialListModule.size() > 0) {
+						for (Map<String,Object> map : orgCredentialListModule) {
+							List<String> verifyRequired = SwingUtils.verifyRequired(orgCerdentialData, map);
+							if(verifyRequired != null && verifyRequired.size() >0) {
+								logger.info("文件名称是"+(String)map.get("fileName")+"文件必填验证"+ Arrays.toString(verifyRequired.toArray()));
+								return;
+							}
+						}
+						HashMap<String,Object> sendMap = new HashMap<>();
+						sendMap.put("transContent", orgCredentialListModule);
+					}
+					if(orgPersonListModule != null && orgPersonListModule.size() > 0) {
+						for (Map<String,Object> map : orgPersonListModule) {
+							List<String> verifyRequired = SwingUtils.verifyRequired(orgPersionCredentialData, map);
+							if(verifyRequired != null && verifyRequired.size() >0) {
+								logger.info("文件名称是"+(String)map.get("fileName")+"文件必填验证"+ Arrays.toString(verifyRequired.toArray()));
+								return;
+							}
+							if(map != null && map.size() > 0) {
+								SendDataUtils.sendRquest(httpClientService, map);
+							}
+						}
+					}
+					if(caPersonListModule != null && caPersonListModule.size() > 0) {
+						for (Map<String,Object> map : caPersonListModule) {
+							List<String> verifyRequired = SwingUtils.verifyRequired(caPersonData, map);
+							if(verifyRequired != null && verifyRequired.size() >0) {
+								logger.info("文件名称是"+(String)map.get("fileName")+"文件必填验证"+ Arrays.toString(verifyRequired.toArray()));
+								return;
+							}
+							if(map != null && map.size() > 0) {
+								SendDataUtils.sendRquest(httpClientService, map);
+							}
+						}
+					}
+					if(caCredentialListModule != null && caCredentialListModule.size() > 0) {
+						for (Map<String,Object> map : caCredentialListModule) {
+							List<String> verifyRequired = SwingUtils.verifyRequired(caCredentialData, map);
+							if(verifyRequired != null && verifyRequired.size() >0) {
+								logger.info("文件名称是"+(String)map.get("fileName")+"文件必填验证"+ Arrays.toString(verifyRequired.toArray()));
+								return;
+							}
+							if(map != null && map.size() > 0) {
+								SendDataUtils.sendRquest(httpClientService, map);
+							}
+						}
+					}
+				}catch(Exception ex) {
+					logger.error("发送请求失败！",ex);
+					
+				}finally {
+					/**不管是否请求是否成功,最终需要清空Map,Set数据集合,否则影响下次上传文件*/
+					orgCredentialListModule.clear();
+					orgPersonListModule.clear();
+					caPersonListModule.clear();
+					caCredentialListModule.clear();
+					set.clear();
+				}
+			}
+		});
 		jFrame.add(jTabbedPane);
         jFrame.pack();  
         /**当点击窗口的关闭按钮时退出程序*/
@@ -287,6 +291,9 @@ public class Client extends ConfigProperties {
         /**显示窗口，前面创建的信息都在内存中，通过 jf.setVisible(true) 把内存中的窗口显示在屏幕上*/ 
         jFrame.setVisible(true);
     }
+
+	
+	
 
 
 	/**
@@ -320,17 +327,24 @@ public class Client extends ConfigProperties {
         caCredentialJtextArea.setBounds(30, 120, 400, 25);
         caCredentialFiledButton.setBounds(530, 120, 180, 25);
         
+        /**统一设置文本域的边框颜色,不允许用户编辑,设置自动换行*/
         orgCdtJtextArea.setLineWrap(true);
+        orgCdtJtextArea.setEditable(false);
         orgCdtJtextArea.setBorder(new LineBorder(new java.awt.Color(127,157,185), 1, false));
         
         orgPersionJtextArea.setLineWrap(true);
+        orgPersionJtextArea.setEditable(false);
         orgPersionJtextArea.setBorder(new LineBorder(new java.awt.Color(127,157,185), 1, false));
         
         caPersionJtextArea.setLineWrap(true);
+        caPersionJtextArea.setEditable(false);
         caPersionJtextArea.setBorder(new LineBorder(new java.awt.Color(127,157,185), 1, false));
         
+        
         caCredentialJtextArea.setLineWrap(true);
+        caCredentialJtextArea.setEditable(false);
         caCredentialJtextArea.setBorder(new LineBorder(new java.awt.Color(127,157,185), 1, false));
+        
         /**添加组件*/
         fileInputCom.add(orgCdtJtextArea);
         fileInputCom.add(orgCdtFiledButton);

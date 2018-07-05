@@ -84,5 +84,12 @@
 		</dependency>
 		<!-- end -->
 		
+		<!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk16 -->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk16</artifactId>
+			<version>1.45</version>
+		</dependency>
+		
 	</dependencies>
 </project>
