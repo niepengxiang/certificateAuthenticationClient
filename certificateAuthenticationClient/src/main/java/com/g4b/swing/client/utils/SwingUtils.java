@@ -445,7 +445,7 @@ public class SwingUtils{
 			}
 		}catch (Exception ex) {
 			logger.error(ex);
-			return null;
+			throw new RuntimeException(ex);
 		}
 		return configMap;
 	}
@@ -510,6 +510,7 @@ public class SwingUtils{
 			logger.info("验证必填项结束");
 		}catch (Exception ex) {
 			logger.error("验证必填项错误",ex);
+			throw new RuntimeException(ex);
 		}
 		return errorlist;
 	}
@@ -588,13 +589,15 @@ public class SwingUtils{
 							/**添加到Set集合*/
 							set.add(file.getName());
 							
-							List<String[]> readExcel = ReadExcelTools.readExcel(file);
+							List<String[]> readExcel = ReadExcelTools.getRowValue(file);
 							Set<Entry<String,Object>> entrySet = mapData.entrySet();
 							Map<String,Object> mapModule = new HashMap<>();
 							for (Entry<String,Object> entry : entrySet) {
 								for (String[] arrStr : readExcel) {
-									if(((List<String>)entry.getValue()).get(1).equals(arrStr[0])) {
-										mapModule.put(entry.getKey(), arrStr[1]);
+									if(entry.getValue() instanceof List) {
+										if(((List<String>)entry.getValue()).get(1).equals(arrStr[0])) {
+											mapModule.put(entry.getKey(), arrStr[1]);
+										}
 									}
 								}
 								
@@ -618,6 +621,7 @@ public class SwingUtils{
 						logger.info("文件数据读取结束");
 					} catch (Exception ex) {
 						logger.error("文件上传失败",ex);
+						throw new RuntimeException(ex);
 					} 
 				}
         	}
