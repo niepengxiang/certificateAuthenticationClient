@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="shortcut icon" href="http://host/favicon.ico"type="image/x-icon" />
-<link rel="import" href="base.html">
+<link href="../../css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -18,35 +17,31 @@
 				<li class="nav-item"><a class="nav-link" href="javascript:void(0);" onClick="pageChange('org_credential');">机构证书用户信息同步
 						<span class="sr-only">(current)</span>
 				</a></li>
-				<li class="nav-item"><a class="nav-link" href="javascript:void(0);" onClick="pageChange('org_person_credential');">个人非机构证书同步</a>
+				<li class="nav-item"><a class="nav-link" href="javascript:void(0);" onClick="pageChange('org_person_credential');">个人(非机构)证书用户信息同步</a>
 				</li>
-				<li class="nav-item"><a class="nav-link" href="javascript:void(0);" onClick="pageChange('ca_person');">CA用户证书同步</a></li>
-				<li class="nav-item"><a class="nav-link"href="javascript:void(0);" onClick="pageChange('ca_credential');">CA证书链同步</a>
+				<li class="nav-item"><a class="nav-link" href="javascript:void(0);" onClick="pageChange('ca_person');">CA用户应用系统访问控制单</a></li>
+				<li class="nav-item"><a class="nav-link"href="javascript:void(0);" onClick="pageChange('ca_credential');">CA机构证书链文件同步</a>
 				<li class="nav-item"><a class="nav-link"href="javascript:void(0);" onClick="pageChange('fileUpload');">证书文件上传同步</a>
 				</li>
 			</ul>
 		</div>
 	</nav>
 	<br>
-	
-	<iframe class = "container" id="iframepage" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="org_credential.html" width="30%" onLoad="iFrameHeight()"></iframe>
+	<div class = "container">
+		<div id="page1"></div>
+	</div>
 	<!-- jQuery (Bootstrap 的 JavaScript 插件需要引入 jQuery) -->
-	<script src="https://code.jquery.com/jquery.js"></script>
+	<script src="../../js/jquery-1.11.3.min.js"></script>
 	<script src="../../js/bootstrap.min.js"></script>
 	
 	<script type="text/javascript">
+		$(function(){
+			$("#page1").load("org_credential.html")
+		});
+	
 		function pageChange(name){
-			document.getElementById("iframepage").setAttribute("src",name+".html'");
+			$("#page1").load(name+".html");
 		}
-		
-		function iFrameHeight() {
-	        var ifm= document.getElementById("iframepage");
-	        var subWeb = document.frames ? document.frames["iframepage"].document : ifm.contentDocument;
-	        if(ifm != null && subWeb != null) {
-	            ifm.height = subWeb.body.scrollHeight;
-	            ifm.width = subWeb.body.scrollWidth;
-	        }
-	    }
 	</script>
 </body>
 </html>

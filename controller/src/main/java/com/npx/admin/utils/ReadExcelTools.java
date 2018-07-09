@@ -1,6 +1,5 @@
 package com.npx.admin.utils;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -150,7 +149,14 @@ public class ReadExcelTools {
 		}
 		return cellValue;
 	}
-
+	
+	/**
+	 * @Title: getRowValue  
+	 * @Description: 获取每一行的值  
+	 * @param  inputStream
+	 * @param  fileName
+	 * @return List<String[]>    返回类型  
+	 */
 	public static List<String[]> getRowValue(InputStream inputStream, String fileName) {
 
 		List<String[]> data = new ArrayList<>();
@@ -194,44 +200,59 @@ public class ReadExcelTools {
 		}
 		return data;
 	}
+	
+	/**
+	 * @Title: readCellsValue  
+	 * @Description: 获取列的值
+	 * @param  inputStream
+	 * @param  fileName
+	 * @return List<List<Object>>    
+	 */
+	public static List<List<Object>> readCellsValue(InputStream inputStream, String fileName) {
 
-	public static List<List<Object>> readCellsValue(InputStream inputStream,String fileName) throws Exception {
-		// HSSFWorkbook 标识整个excel
-		Workbook workBook = getWorkBook(inputStream, fileName);
-		List<List<Object>> result = new ArrayList<List<Object>>();
-		int size = workBook.getNumberOfSheets();
-		// 循环每一页，并处理当前循环页
-		for (int numSheet = 0; numSheet < size; numSheet++) {
-			// HSSFSheet 标识某一页
-			Sheet sheet = workBook.getSheetAt(numSheet);
-			if (sheet == null) {
-				continue;
-			}
-
-			int firstRowNum = sheet.getFirstRowNum();
-
-			Row row = sheet.getRow(firstRowNum);
-
-			if (row == null) {
-				continue;
-			}
-			int cells = row.getPhysicalNumberOfCells();
-
-			// 处理当前页，循环读取每一行
-			for (int rowNum = 2; rowNum <= sheet.getLastRowNum(); rowNum++) {
-				// HSSFRow表示行
-				Row hssfRow = sheet.getRow(rowNum);
-				int minColIx = hssfRow.getFirstCellNum();
-				List<Object> rowList = new ArrayList<Object>();
-				// 遍历改行，获取处理每个cell元素
-				for (int colIx = minColIx; colIx < cells; colIx++) {
-					// HSSFCell 表示单元格
-					Cell cell = hssfRow.getCell(colIx);
-					rowList.add(getCellValue(cell));
+		try {
+			
+			logger.info("文件"+fileName+"开始读取");
+			// HSSFWorkbook 标识整个excel
+			Workbook workBook = getWorkBook(inputStream, fileName);
+			List<List<Object>> result = new ArrayList<List<Object>>();
+			int size = workBook.getNumberOfSheets();
+			// 循环每一页，并处理当前循环页
+			for (int numSheet = 0; numSheet < size; numSheet++) {
+				// HSSFSheet 标识某一页
+				Sheet sheet = workBook.getSheetAt(numSheet);
+				if (sheet == null) {
+					continue;
 				}
-				result.add(rowList);
+
+				int firstRowNum = sheet.getFirstRowNum();
+
+				Row row = sheet.getRow(firstRowNum);
+
+				if (row == null) {
+					continue;
+				}
+				int cells = row.getPhysicalNumberOfCells();
+
+				// 处理当前页，循环读取每一行
+				for (int rowNum = 2; rowNum <= sheet.getLastRowNum(); rowNum++) {
+					// HSSFRow表示行
+					Row hssfRow = sheet.getRow(rowNum);
+					int minColIx = hssfRow.getFirstCellNum();
+					List<Object> rowList = new ArrayList<Object>();
+					// 遍历改行，获取处理每个cell元素
+					for (int colIx = minColIx; colIx < cells; colIx++) {
+						// HSSFCell 表示单元格
+						Cell cell = hssfRow.getCell(colIx);
+						rowList.add(getCellValue(cell));
+					}
+					result.add(rowList);
+				}
 			}
+			logger.info("文件"+fileName+"读取结束");
+			return result;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
-		return result;
 	}
 }

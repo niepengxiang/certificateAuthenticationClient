@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,7 +53,8 @@ public class DataReceiverController {
 		try {
 			
 			Map<String,Object> dataMap = new HashMap<>();
-			
+			orgCredential.setSigCer(Base64Utils.encodeToString(orgCredential.getSigCer().getBytes()));
+			orgCredential.setEncCer(Base64Utils.encodeToString(orgCredential.getEncCer().getBytes()));
 			dataMap.put("transContent", orgCredential);
 			HttpResponseEntity responseEntity = httpClinetService.sendPost("", ObjectTOMapUtils.obj2Map(dataMap),
 					false);
@@ -79,7 +81,8 @@ public class DataReceiverController {
 		try {
 			
 			Map<String,Object> dataMap = new HashMap<>();
-			
+			orgPersonCredential.setSigCer(Base64Utils.encodeToString(orgPersonCredential.getSigCer().getBytes()));
+			orgPersonCredential.setEncCer(Base64Utils.encodeToString(orgPersonCredential.getEncCer().getBytes()));
 			dataMap.put("transContent", orgPersonCredential);
 			
 			HttpResponseEntity responseEntity = httpClinetService.sendPost("",
