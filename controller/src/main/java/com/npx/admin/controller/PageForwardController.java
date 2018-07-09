@@ -18,11 +18,22 @@ public class PageForwardController {
 	@GetMapping("/{viewName}")
 	public String forward(@PathVariable("viewName")String viewName){
 		if(StringUtils.isNoneBlank(viewName)){
+			if(viewName.equals("favicon")) {
+				return null;
+			}
 			return viewName;
 		}
 		return null;
 	}
 	
+	@GetMapping("/")
+	public String forward(){
+		return "index";
+	}
 	
+	@GetMapping("/favicon.ico")
+	public void favicon_ico() {
+		
+	}
 	
 }
