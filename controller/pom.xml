@@ -129,8 +129,8 @@
 			<artifactId>joda-time</artifactId>
 			<version>${joda-time.version}</version>
 		</dependency>
-		
-		
+
+
 		<!-- 配置httpClient start -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
@@ -144,24 +144,31 @@
 			<version>${htttpClient.version}</version>
 		</dependency>
 		<!-- end -->
-		
+
 		<!-- apache poi start -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
 			<version>${poi.version}</version>
 		</dependency>
-		
+
 		<dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>${poi.version}</version>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>${poi.version}</version>
 		</dependency>
 		<!-- end -->
+
+		<!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk16 -->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk16</artifactId>
+			<version>1.46</version>
+		</dependency>
 	</dependencies>
-	
-	
-	
+
+
+
 	<!-- 项目构建部分 -->
 	<build>
 		<finalName>${project.artifactId}</finalName>

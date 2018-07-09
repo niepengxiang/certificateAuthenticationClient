@@ -28,7 +28,7 @@ public class PkiUtils {
 	}
 	private static synchronized void load()
 	{
-		keyStoreName = "";//"e://test.pfx";//PropertiesUtil.getProperties("jchrpt.properties").getProperty("keyStoreName");
+		keyStoreName = "/pfx/clientkeystorename.pfx";//"e://test.pfx";//PropertiesUtil.getProperties("jchrpt.properties").getProperty("keyStoreName");
 		keyStoreType = "PKCS12";
 		keyStorePassword = "123456".toCharArray();
 		keystoreAlias = "";

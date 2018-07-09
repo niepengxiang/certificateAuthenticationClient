@@ -8,37 +8,40 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.npx.admin.intercepter.DataModule;
 import com.npx.admin.pojo.CaCredential;
+import com.npx.admin.pojo.HttpResponseEntity;
 import com.npx.admin.pojo.OrgCredential;
 import com.npx.admin.pojo.OrgPersonCredential;
 import com.npx.admin.pojo.Result;
 import com.npx.admin.utils.HttpClientService;
+import com.npx.admin.utils.PkiUtils;
 import com.npx.admin.utils.ReadExcelTools;
 
 @Controller
-public class FileUploadController {
-	private static final String ORGCREDENTIAL = "机构证书用户信息同步";
-	private static final String ORGPERSONCREDENTIAL = "个人非机构证书用户信息同步";
-	private static final String CAPERSON = "CA用户证书信息同步";
-	private static final String CACREDENTIAL = "CA证书链信息同步";
+public class FileUploadController implements DataModule {
 
 	Logger logger = LoggerFactory.getLogger(FileUploadController.class);
 
 	@Autowired
 	@Qualifier("httpClientService")
 	private HttpClientService httpClinetService;
+
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@RequestMapping(value = "/upload", method = RequestMethod.POST)
 	@ResponseBody
@@ -59,16 +62,16 @@ public class FileUploadController {
 					if (excelFile != null) {
 						/** 获取上传文件名称 */
 						String fileName = excelFile.getOriginalFilename();
-
+						
 						/**
 						 * 传入文件的输入流和文件名称 文件名判断Excel后缀名判断不同的类型 获取文件的第一行的标题
 						 */
 						String firstCellValue = (String) ReadExcelTools.getFirstCellValue(excelFile.getInputStream(),
 								fileName);
-
+						List<StringBuffer> buffers = new ArrayList<>();
 						/** 标题判断 */
 						if (firstCellValue.equals(ORGCREDENTIAL)) {
-
+							
 							List<List<Object>> readExcel = ReadExcelTools.readCellsValue(excelFile.getInputStream(),
 									fileName);
 							for (int i = 0; i < readExcel.size(); i++) {
@@ -79,8 +82,8 @@ public class FileUploadController {
 								orgCredential.setReqOpt((String) model.get(1));
 								orgCredential.setSigCertSn((String) model.get(2));
 								orgCredential.setEncCertSn((String) model.get(3));
-								orgCredential.setSigCer(Base64Utils.encodeToString(((String) model.get(4)).getBytes()));
-								orgCredential.setEncCer(Base64Utils.encodeToString(((String) model.get(5)).getBytes()));
+								orgCredential.setSigCer((String) model.get(4));
+								orgCredential.setEncCer((String) model.get(5));
 								orgCredential.setCertStatus(Integer.parseInt((String) model.get(6)));
 								orgCredential.setCertIssuer((String) model.get(7));
 								orgCredential.setCertUserTypeID((String) model.get(8));
@@ -105,7 +108,6 @@ public class FileUploadController {
 
 							/** 标题判断 */
 						} else if (firstCellValue.equals(ORGPERSONCREDENTIAL)) {
-
 							List<List<Object>> readExcel = ReadExcelTools.readCellsValue(excelFile.getInputStream(),
 									fileName);
 							for (int i = 0; i < readExcel.size(); i++) {
@@ -115,10 +117,8 @@ public class FileUploadController {
 								orgPersonCredential.setReqOpt((String) model.get(1));
 								orgPersonCredential.setSigCertSn((String) model.get(2));
 								orgPersonCredential.setEncCertSn((String) model.get(3));
-								orgPersonCredential
-										.setSigCer(Base64Utils.encodeToString(((String) model.get(4)).getBytes()));
-								orgPersonCredential
-										.setEncCer(Base64Utils.encodeToString(((String) model.get(5)).getBytes()));
+								orgPersonCredential.setSigCer((String) model.get(4));
+								orgPersonCredential.setEncCer((String) model.get(5));
 								orgPersonCredential.setCertStatus(Integer.parseInt((String) model.get(6)));
 								orgPersonCredential.setCertIssuer((String) model.get(7));
 								orgPersonCredential.setUserName((String) model.get(8));
@@ -136,9 +136,83 @@ public class FileUploadController {
 								orgPersonCredential.setEmail((String) model.get(20));
 								orgPersonCredentials.add(orgPersonCredential);
 							}
+							
 							dataMap.put("transContent", credentials);
+							String sign = PkiUtils.sign(objectMapper.writeValueAsString(caCredentials));
+							dataMap.put("transSignedValue", sign);
+							
+							/**发送请求*/
+							HttpResponseEntity responseEntity = httpClinetService.sendPost(null, dataMap, false);
+							
+							/**判断返回状态码*/
+							if (responseEntity.getStatusCode() == HttpStatus.SC_OK) {
+								String content = responseEntity.getContent();
+								/**解析返回JSON数据*/
+								Map<String, Object> readValue = objectMapper.readValue(content, Map.class);
+								
+								StringBuffer dataBuffer = new StringBuffer();
+								/**PK签名值判断*/
+								if (PkiUtils.checkSign(content, (String) readValue.get(TRANSSIGNEDVALUE))) {
+									List<Map<String, Object>> transContents = (List<Map<String, Object>>) readValue.get(TRANSCONTENT);
+									/** 返回数据内容 */
+									if (transContents != null && transContents.size() > 0) {
+										for (int i = 0; i < transContents.size(); i++) {
+											StringBuffer stringBuffer = new StringBuffer();
+											if (i != 0) {
+												dataBuffer.append("\n\r");
+											}
+											stringBuffer.append(ZH_AUTHSRCID).append(transContents.get(i).get(AUTHSRCID)).append("\n\r")
+													.append(ZH_RESULTSTATE);
+											if (transContents.get(i).get(RESULTSTATE).equals(0)) {
+												stringBuffer.append(ZH_RESULTSTATE1).append("\n\r");
+											} else if (transContents.get(i).get(RESULTSTATE).equals(1)) {
+												stringBuffer.append(ZH_RESULTSTATE2).append("\n\r");
+											} else if (transContents.get(i).get(RESULTSTATE).equals(2)) {
+												stringBuffer.append(ZH_RESULTSTATE3).append("\n\r");
+											}
 
-							httpClinetService.sendPost(null, dataMap, false);
+											stringBuffer.append(ZH_TOTALNUM).append(transContents.get(i).get(TOTALNUM)).append("\n\r")
+													.append(ZH_FAILNUM).append(transContents.get(i).get(FAILNUM)).append("\n\r");
+
+											List<Map<String,Object>> failArrs = (List<Map<String, Object>>) transContents.get(i).get("failArr");
+											if (failArrs != null && failArrs.size() > 0) {
+												StringBuffer failArrsBuffer = new StringBuffer();
+												for (int j = 0; j < failArrs.size(); j++) {
+													if(j != 0) {
+														failArrsBuffer.append("\n\r");
+													}
+													failArrsBuffer.append(ZH_REQOPT).append(failArrs.get(i).get(REQOPT)).append("\n\r")
+																  .append(ZH_SIGCERTSN).append(failArrs.get(i).get(SIGCERTSN)).append("\n\r")
+																  .append(ZH_ERRORCODE);
+													Object errorCode = failArrs.get(i).get(ERRORCODE);
+													if(errorCode.equals(ERRORCODENUM0)) {
+														failArrsBuffer.append(ZH_ERRORCODENUM0).append("\n\r");
+													}else if(errorCode.equals(ERRORCODENUM1)) {
+														failArrsBuffer.append(ZH_ERRORCODENUM1).append("\n\r");
+													}else if(errorCode.equals(ERRORCODENUM2)) {
+														failArrsBuffer.append(ZH_ERRORCODENUM2).append("\n\r");
+													}else if(errorCode.equals(ERRORCODENUM3)) {
+														failArrsBuffer.append(ZH_ERRORCODENUM3).append("\n\r");
+													}else if(errorCode.equals(ERRORCODENUM4)) {
+														failArrsBuffer.append(ZH_ERRORCODENUM4).append("\n\r");
+													}
+													failArrsBuffer.append(ZH_ERRORMSG);
+													Object errorMsg = failArrs.get(i).get(ERRORMSG);
+													if(errorMsg != null) {
+														failArrsBuffer.append(failArrs.get(i).get(ERRORMSG));
+													}
+												}
+												stringBuffer.append("\n\r").append(failArrsBuffer.toString());
+											}
+											
+											dataBuffer.append(stringBuffer.toString());
+										}
+									}
+								}else {
+									dataBuffer.append("本地数字证书有误!");
+								}
+								buffers.add(dataBuffer);
+							}
 
 							/** 标题判断 */
 						} else if (firstCellValue.equals(CAPERSON)) {
@@ -175,13 +249,22 @@ public class FileUploadController {
 							dataMap.put("transContent", caCredentials);
 							httpClinetService.sendPost(null, dataMap, false);
 						} else {
-
 							/** 文件类型不匹配 */
 							return new Result(false, "不是需要的文件的类型！");
 						}
-
+						
+						StringBuffer responeBuffer = new StringBuffer();
+						if(buffers != null && buffers.size() > 0) {
+							for (int i = 0; i < buffers.size(); i++) {
+								if(i != 0) {
+									responeBuffer.append("\n\r");
+								}
+								responeBuffer.append(buffers.get(i).toString());
+							}
+						}
+						
 						/** 文件上传成功 */
-						return new Result(true);
+						return new Result(true,responeBuffer.toString());
 					}
 				}
 			}
