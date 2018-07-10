@@ -18,7 +18,7 @@ public interface DataModule {
 	public static final String AUTHSRCID = "authSrcId";
 	
 	public static final String ZH_RESULTSTATE = "同步结果：";
-	public static final String RESULTSTATE = "resultstate";
+	public static final String RESULTSTATE = "resultState";
 	public static final String ZH_RESULTSTATE1 = "有部分数据同步失败!";
 	public static final String ZH_RESULTSTATE2 = "所有都同步成功!";
 	public static final String ZH_RESULTSTATE3 = "参数不正确，传入参数名或值有误!";
@@ -32,6 +32,9 @@ public interface DataModule {
 	
 	public static final String ZH_REQOPT = "请求操作：";
 	public static final String REQOPT = "reqOpt";
+	public static final String REQOPTADD = "增加";
+	public static final String REQOPTUPDATE = "更新";
+	public static final String REQOPTDELETE = "删除";
 	
 	public static final String ZH_SIGCERTSN = "数字证书序列号：";
 	public static final String SIGCERTSN = "sigCertSn";
@@ -52,6 +55,18 @@ public interface DataModule {
 	public static final String ERRORCODENUM4 = "E000004";
 	
 	public static final String ZH_ERRORMSG = "错误信息：";
-	public static final String ERRORMSG = "ERRORMSG";
+	public static final String ERRORMSG = "errorMsg";
 	
+	
+	public static final String ZH_APPSYSIDS = "用户进行访问控制：";
+	public static final String APPSYSIDS = "appsysids";
+	
+	public static final String ZH_APPSYSID1 = "省统一身份认证平台";
+	public static final String ZH_APPSYSID2 = "省公共资源";
+	public static final String APPSYSID1 = "ASCODE10001";
+	public static final String APPSYSID2 = "ASCODE10002";
+	
+	
+	public static final String ZH_CERTCHAINID = "证书链ID:";
+	public static final String CERTCHAINID = "certChainId";
 }

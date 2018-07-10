@@ -16,22 +16,18 @@
    <!-- 开启注解扫描 -->
    <context:component-scan base-package="com.npx.admin.controller"></context:component-scan>
    
+   <!-- 读取属性文件 -->
+   <context:property-placeholder location="classpath:server.properties"/>
+   
+   
    <!-- 开启springMVC注解模式 -->
-   <mvc:annotation-driven>
-   		<!-- 配置返回字符串中文乱码 -->
-   		<mvc:message-converters register-defaults="true">
-            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
-                <constructor-arg value="UTF-8" />
-            </bean>
-        </mvc:message-converters>
-   </mvc:annotation-driven>
+   <mvc:annotation-driven></mvc:annotation-driven>
       	
-   	<mvc:resources location="/" mapping="/**/*.html"/>  
-	<mvc:resources location="/" mapping="/**/*.js"/>  
-	<mvc:resources location="/" mapping="/**/*.css"/>  
-	<mvc:resources location="/" mapping="/**/*.png"/>  
-	<mvc:resources location="/" mapping="/**/*.gif"/> 
-	<mvc:resources location="favicon.ico" mapping="favicon.ico"/> 
+   <mvc:resources location="/" mapping="/**/*.html"/>  
+   <mvc:resources location="/" mapping="/**/*.js"/>  
+   <mvc:resources location="/" mapping="/**/*.css"/>  
+   <mvc:resources location="/" mapping="/**/*.png"/>  
+   <mvc:resources location="/" mapping="/**/*.gif"/> 
 	
 		   
    <!-- 配置文件上传解析器 -->
@@ -70,14 +66,35 @@
 		<property name="viewClass" value="org.springframework.web.servlet.view.freemarker.FreeMarkerView"></property>
 	</bean> 
 	
-	<!-- 配置JackJson解析数据 -->
-	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
-        <property name="messageConverters">
-            <list>
-            	<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"></bean>
-               <!--   <ref bean="mappingJacksonHttpMessageConverter" />-->
-            </list>
-        </property>
-	</bean>
 	<bean id="httpClientService" class="com.npx.admin.utils.HttpClientService"></bean>
+	
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping" />
+	
+	<!--通过处理器适配器AnnotationMethodHandlerAdapter来开启支持@RequestMapping注解-->
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+	    <property name="messageConverters">
+	        <list>
+	            <!-- 设置返回字符串编码 -->
+	            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+	                <property name = "supportedMediaTypes">
+	                    <list>
+	                        <value>text/html;charset=UTF-8</value>
+	                        <value>application/json;charset=UTF-8</value>
+	                    </list>
+	                </property>
+	            </bean>
+	            <!-- json转换器 -->
+	            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+	                <property name="supportedMediaTypes">
+	                    <list>
+	                        <value>text/html;charset=UTF-8</value>
+	                        <value>application/json;charset=UTF-8</value>
+	                    </list>
+	                </property>
+	            </bean>
+	        </list>
+	    </property>
+</bean>
+
+<bean id="objectMapper" class="com.fasterxml.jackson.databind.ObjectMapper"></bean>
 </beans>

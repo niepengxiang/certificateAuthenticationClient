@@ -40,11 +40,11 @@
 				<span class="input-group-text" id="inputGroup-sizing-default">请求操作：</span>
 			</div>
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <label class="radio-inline"> <input
-				type="radio" name="reqOpt" value="i" checked>新增
+				type="radio" name="reqOpt" value="I" checked>新增
 			</label> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <label class="radio-inline">
-				<input type="radio" name="reqOpt" value="u">更新
+				<input type="radio" name="reqOpt" value="U">更新
 			</label> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <label class="radio-inline">
-				<input type="radio" name="reqOpt" value="d">删除
+				<input type="radio" name="reqOpt" value="D">删除
 			</label>
 		</div>
 		<div class="input-group mb-3">
@@ -84,25 +84,6 @@
 </body>
 		<script type="text/javascript" src="../../js/jquery-1.11.3.min.js"></script>
 		<script type="text/javascript" src="../../js/common.js"></script>
+		<script type="text/javascript" src="../../js/credential/credentialAjax.js"></script>
 		<script src="../../js/bootstrap.min.js"></script>
-		<script type="text/javascript">
-		 	var $modal = $('#myModal');
-		    function submitCaPerson(){
-				$.ajax({
-					url:"/data/caPerson",
-					type:"post",
-					data:JSON.stringify($("#caPersonFrom").serializeObject()),
-					dataType:"text",
-					contentType:"application/json;charse=UTF-8",
-					success: function(msg){
-					  $modal.find('.modal-body p').html(msg);
-					  $modal.modal({backdrop: 'static'});
-					}
-				});
-				return false;
-			}
-		    
-		</script>
-
-
 </html>

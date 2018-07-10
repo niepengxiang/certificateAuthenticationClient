@@ -31,9 +31,10 @@ public class PageForwardController {
 		return "index";
 	}
 	
-	@GetMapping("/favicon.ico")
-	public void favicon_ico() {
+	
+	@GetMapping("/avicon.ico")
+	public void avicon_ico(){
+		
 		
 	}
-	
 }

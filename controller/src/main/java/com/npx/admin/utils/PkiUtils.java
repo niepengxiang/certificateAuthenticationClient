@@ -1,4 +1,5 @@
 package com.npx.admin.utils;
+import java.io.File;
 import java.io.FileInputStream;
 import java.security.KeyFactory;
 import java.security.KeyStore;
@@ -28,7 +29,11 @@ public class PkiUtils {
 	}
 	private static synchronized void load()
 	{
-		keyStoreName = "/pfx/clientkeystorename.pfx";//"e://test.pfx";//PropertiesUtil.getProperties("jchrpt.properties").getProperty("keyStoreName");
+		String path = PkiUtils.class.getClassLoader().getResource("//").getPath();
+		File file = new File(path).getParentFile().getParentFile();
+		String ketSoreNamePath = file.getPath() + "\\pfx\\clientkeystorename.pfx";
+		
+		keyStoreName = ketSoreNamePath;//"e://test.pfx";//PropertiesUtil.getProperties("jchrpt.properties").getProperty("keyStoreName");
 		keyStoreType = "PKCS12";
 		keyStorePassword = "123456".toCharArray();
 		keystoreAlias = "";
@@ -119,8 +124,9 @@ public class PkiUtils {
 		String sign = PkiUtils.sign(p);
 		System.out.println(PkiUtils.sign(p));
 		System.out.println("签名值："+sign);
-		PkiUtils.checkSign(p,sign);
-		PkiUtils.checkSign1(p, sign);
+		boolean checkSign = PkiUtils.checkSign(p,sign);
+		//PkiUtils.checkSign1(p, sign);
+		System.out.println(checkSign);
 	}
 	
 	public static void main(String[] args) throws Exception {
